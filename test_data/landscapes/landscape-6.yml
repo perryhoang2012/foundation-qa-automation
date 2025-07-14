@@ -1,0 +1,60 @@
+mesh:
+  - id: meshEducation
+    name: Education Mesh
+
+systems:
+  - id: sysUniversityPortal
+    name: University Portal System
+
+  - id: sysLearningPlatform
+    name: Online Learning Platform
+
+sources:
+  - id: sourceStudents
+    system: sysUniversityPortal
+    name: Student Information System
+
+  - id: sourceCourses
+    system: sysUniversityPortal
+    name: Course Catalog
+
+  - id: sourceActivity
+    system: sysLearningPlatform
+    name: Learning Activity Tracker
+
+  - id: sourceGrades
+    system: sysLearningPlatform
+    name: Grading Database
+
+objects:
+  - id: objStudentProfiles
+    source: sourceStudents
+    name: Student Profiles
+
+  - id: objCourseList
+    source: sourceCourses
+    name: Course List
+
+  - id: objActivityLogs
+    source: sourceActivity
+    name: Activity Logs
+
+  - id: objGrades
+    source: sourceGrades
+    name: Grade Records
+
+products:
+  - id: prodEnrollmentSummary
+    input: [objStudentProfiles, objCourseList]
+    mesh: meshEducation
+    name: Enrollment Summary
+
+  - id: prodPerformanceOverview
+    input: [objGrades, objActivityLogs]
+    mesh: meshEducation
+    name: Performance Overview
+
+  - id: prodStudentDashboard
+    input: [prodEnrollmentSummary, prodPerformanceOverview]
+    mesh: meshEducation
+    name: Student Dashboard

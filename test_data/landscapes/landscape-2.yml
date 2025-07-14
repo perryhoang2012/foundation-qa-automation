@@ -1,0 +1,46 @@
+mesh:
+  - id: mesh1
+
+systems:
+  - id: sys1
+
+sources:
+  - id: sourceA
+    system: sys1
+  - id: sourceB
+    system: sys1
+  - id: sourceC
+    system: sys1
+
+objects:
+  - id: obj1
+    source: sourceA
+  - id: obj2
+    source: sourceA
+  - id: obj3
+    source: sourceB
+  - id: obj4
+    source: sourceB
+  - id: obj5
+    source: sourceC
+
+products:
+  - id: prod1
+    input: [obj1, obj2, obj3]
+    mesh: mesh1
+
+  - id: prod2
+    input: [obj4]
+    mesh: mesh1
+
+  - id: prod3
+    input: [obj4]
+    mesh: mesh1
+
+  - id: prod4
+    input: [obj4]
+    mesh: mesh1
+
+  - id: prod5
+    input: [obj4]
+    mesh: mesh1

@@ -1,0 +1,23 @@
+mesh:
+  - id: mesh1
+    name: 'Hello Mesh'
+
+systems:
+  - id: sys1
+    name: 'Hello System'
+
+sources:
+  - id: sourceA
+    system: sys1
+    name: 'Hello Source'
+
+objects:
+  - id: obj1
+    source: sourceA
+    name: 'Hello Object'
+
+products:
+  - id: prod1
+    input: [obj1]
+    name: 'Hello Product'
+    mesh: mesh1

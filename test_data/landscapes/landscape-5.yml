@@ -1,0 +1,115 @@
+mesh:
+  - id: meshHealthcare
+    name: Healthcare Mesh
+
+systems:
+  - id: sysHospitalA
+    name: General Hospital A
+  - id: sysHospitalB
+    name: Regional Clinic B
+  - id: sysPharmacyNetwork
+    name: Pharmacy Network System
+
+sources:
+  - id: sourceMedicalRecords
+    system: sysHospitalA
+    name: EMR System
+  - id: sourceLabResults
+    system: sysHospitalA
+    name: Laboratory System
+  - id: sourceAdmissions
+    system: sysHospitalB
+    name: Patient Admission Logs
+  - id: sourcePrescriptions
+    system: sysPharmacyNetwork
+    name: E-Prescription DB
+  - id: sourceDischarges
+    system: sysHospitalB
+    name: Discharge Records
+
+objects:
+  - id: objPatients
+    source: sourceMedicalRecords
+    name: Patient Demographics
+
+  - id: objVisits
+    source: sourceAdmissions
+    name: Admission Records
+
+  - id: objLabTests
+    source: sourceLabResults
+    name: Lab Results Table
+
+  - id: objMedications
+    source: sourcePrescriptions
+    name: Medication Records
+
+  - id: objDischarges
+    source: sourceDischarges
+    name: Discharge Summaries
+
+  - id: objDiagnoses
+    source: sourceMedicalRecords
+    name: Diagnosis Codes
+
+  - id: objVitalSigns
+    source: sourceMedicalRecords
+    name: Vital Sign Logs
+
+  - id: objBilling
+    source: sourceAdmissions
+    name: Billing Information
+
+  - id: objAllergies
+    source: sourceMedicalRecords
+    name: Allergy Reports
+
+  - id: objProviders
+    source: sourceMedicalRecords
+    name: Provider Directory
+
+products:
+  - id: prodPatientProfile
+    input: [objPatients, objVisits, objVitalSigns, objAllergies]
+    mesh: meshHealthcare
+    name: Patient 360 Profile
+
+  - id: prodCareTimeline
+    input: [objVisits, objDischarges, objDiagnoses, objMedications]
+    mesh: meshHealthcare
+    name: Full Care Timeline
+
+  - id: prodClinicalQuality
+    input: [objLabTests, objDiagnoses, objVitalSigns]
+    mesh: meshHealthcare
+    name: Clinical Quality Metrics
+
+  - id: prodUtilizationReport
+    input: [objVisits, objDischarges, objBilling]
+    mesh: meshHealthcare
+    name: Hospital Utilization Report
+
+  - id: prodPrescribingPatterns
+    input: [objMedications, objDiagnoses, objProviders]
+    mesh: meshHealthcare
+    name: Prescribing Behavior Analysis
+
+  - id: prodOutcomeAnalysis
+    input: [prodCareTimeline, prodClinicalQuality]
+    mesh: meshHealthcare
+    name: Treatment Outcome Analysis
+
+  - id: prodCostInsights
+    input: [objBilling, prodPrescribingPatterns]
+    mesh: meshHealthcare
+    name: Cost and Resource Insights
+
+  - id: prodOperationsDashboard
+    input: [prodUtilizationReport, prodCostInsights]
+    mesh: meshHealthcare
+    name: Ops and Finance Dashboard
+
+  - id: prodCxoSummary
+    input: [prodOutcomeAnalysis, prodOperationsDashboard]
+    mesh: meshHealthcare
+    name: Executive Summary Report

@@ -1,0 +1,197 @@
+mesh:
+  - id: meshAirline
+    name: Airline Intelligence Mesh
+
+systems:
+  - id: sysFlightOps
+    name: Flight Operations System
+
+  - id: sysReservation
+    name: Booking and Ticketing System
+
+  - id: sysCheckIn
+    name: Check In and Boarding System
+
+  - id: sysLoyalty
+    name: Loyalty and Marketing System
+
+  - id: sysCustomerService
+    name: Customer Service System
+
+sources:
+  - id: sourceFlightOps
+    system: sysFlightOps
+    name: Flight Ops Database
+
+  - id: sourceReservation
+    system: sysReservation
+    name: Reservation and Ticketing DB
+
+  - id: sourceCheckIn
+    system: sysCheckIn
+    name: Check In Events DB
+
+  - id: sourceLoyalty
+    system: sysLoyalty
+    name: Loyalty Program DB
+
+  - id: sourceSupport
+    system: sysCustomerService
+    name: Support and Feedback DB
+
+objects:
+  # Flight Operations
+  - id: objFlights
+    source: sourceFlightOps
+    name: Flight Schedule
+
+  - id: objFlightStatus
+    source: sourceFlightOps
+    name: Flight Status Logs
+
+  - id: objAircraft
+    source: sourceFlightOps
+    name: Aircraft Inventory
+
+  - id: objCrew
+    source: sourceFlightOps
+    name: Crew Assignments
+
+  - id: objRoutes
+    source: sourceFlightOps
+    name: Flight Routes
+
+  - id: objMaintenance
+    source: sourceFlightOps
+    name: Maintenance Logs
+
+  - id: objWeather
+    source: sourceFlightOps
+    name: Weather Conditions
+
+  # Reservation & Ticketing
+  - id: objCustomers
+    source: sourceReservation
+    name: Customer Profiles
+
+  - id: objBookings
+    source: sourceReservation
+    name: Booking Records
+
+  - id: objTickets
+    source: sourceReservation
+    name: Ticket Sales
+
+  - id: objPayments
+    source: sourceReservation
+    name: Payment Transactions
+
+  - id: objSeatAssignments
+    source: sourceReservation
+    name: Seat Selection Logs
+
+  - id: objPricing
+    source: sourceReservation
+    name: Flight Pricing Table
+
+  # Check-In & Boarding
+  - id: objCheckIns
+    source: sourceCheckIn
+    name: Check In Events
+
+  - id: objBoarding
+    source: sourceCheckIn
+    name: Boarding Pass Scans
+
+  - id: objGates
+    source: sourceCheckIn
+    name: Gate Change Events
+
+  - id: objBaggage
+    source: sourceCheckIn
+    name: Baggage Tracking Logs
+
+  # Loyalty & Marketing
+  - id: objFrequentFlyers
+    source: sourceLoyalty
+    name: Loyalty Members
+
+  - id: objMiles
+    source: sourceLoyalty
+    name: Miles Earned
+
+  - id: objPromotions
+    source: sourceLoyalty
+    name: Promotion Campaigns
+
+  - id: objRewards
+    source: sourceLoyalty
+    name: Reward Redemptions
+
+  # Customer Service
+  - id: objSupportTickets
+    source: sourceSupport
+    name: Customer Support Cases
+
+  - id: objDisruptions
+    source: sourceSupport
+    name: Disrupted Flights
+
+  - id: objFeedback
+    source: sourceSupport
+    name: Customer Feedback
+
+  - id: objServiceRecovery
+    source: sourceSupport
+    name: Compensation Offers
+
+products:
+  - id: prodFlightPunctuality
+    input: [objFlights, objFlightStatus]
+    mesh: meshAirline
+    name: On Time Performance Metrics
+
+  - id: prodCrewUtilization
+    input: [objCrew, objFlights]
+    mesh: meshAirline
+    name: Crew Efficiency Report
+
+  - id: prodMaintenanceDelays
+    input: [objFlights, objMaintenance]
+    mesh: meshAirline
+    name: Maintenance Delay Analysis
+
+  - id: prodRevenueBreakdown
+    input: [objTickets, objPayments, objBookings]
+    mesh: meshAirline
+    name: Revenue by Route and Segment
+
+  - id: prodOverbookingRisk
+    input: [objBookings, objSeatAssignments, objCheckIns]
+    mesh: meshAirline
+    name: Overbooking Prediction Score
+
+  - id: prodDynamicPricingSignal
+    input: [objPricing, objBookings, objFlights]
+    mesh: meshAirline
+    name: Price Elasticity Indicators
+
+  - id: prodLoyaltyValueScore
+    input: [objFrequentFlyers, objMiles, objRewards]
+    mesh: meshAirline
+    name: Loyalty Member Lifetime Value
+
+  - id: prodCustomerChurnRisk
+    input: [objSupportTickets, objDisruptions, objFeedback]
+    mesh: meshAirline
+    name: Churn Risk Detection
+
+  - id: prodTopPerformingRoutes
+    input: [objRoutes, prodRevenueBreakdown, prodFlightPunctuality]
+    mesh: meshAirline
+    name: Most Profitable and Reliable Routes
+
+  - id: prodCustomerExperienceScore
+    input: [objFeedback, objSupportTickets, objServiceRecovery]
+    mesh: meshAirline
+    name: Customer Satisfaction Index

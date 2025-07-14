@@ -1,0 +1,108 @@
+mesh:
+  - id: meshEnterprise
+
+systems:
+  - id: sysDataWarehouse
+  - id: sysIoT
+  - id: sysMarketing
+
+sources:
+  - id: sourceCustomer
+    system: sysDataWarehouse
+  - id: sourceOrders
+    system: sysDataWarehouse
+  - id: sourceIoTSensor
+    system: sysIoT
+  - id: sourceDeviceLogs
+    system: sysIoT
+  - id: sourceEmail
+    system: sysMarketing
+  - id: sourceAdClicks
+    system: sysMarketing
+
+objects:
+  - id: objCustomers
+    source: sourceCustomer
+  - id: objOrders
+    source: sourceOrders
+  - id: objSensors
+    source: sourceIoTSensor
+  - id: objLogs
+    source: sourceDeviceLogs
+  - id: objEmails
+    source: sourceEmail
+  - id: objClicks
+    source: sourceAdClicks
+  - id: objGeo
+    source: sourceIoTSensor
+  - id: objSessions
+    source: sourceDeviceLogs
+  - id: objReturns
+    source: sourceOrders
+  - id: objLoyalty
+    source: sourceCustomer
+  - id: objOpenRates
+    source: sourceEmail
+  - id: objCampaigns
+    source: sourceAdClicks
+
+products:
+  - id: prodCustomer360
+    input: [objCustomers, objLoyalty, objOrders]
+    mesh: meshEnterprise
+
+  - id: prodSensorSummary
+    input: [objSensors, objGeo]
+    mesh: meshEnterprise
+
+  - id: prodLogView
+    input: [objLogs, objSessions]
+    mesh: meshEnterprise
+
+  - id: prodEngagement
+    input: [objEmails, objOpenRates, objClicks, objCampaigns]
+    mesh: meshEnterprise
+
+  - id: prodBehavioralModel
+    input: [prodEngagement, prodCustomer360]
+    mesh: meshEnterprise
+
+  - id: prodDeviceHealth
+    input: [prodSensorSummary, prodLogView]
+    mesh: meshEnterprise
+
+  - id: prodSalesReport
+    input: [objOrders, objReturns]
+    mesh: meshEnterprise
+
+  - id: prodMarketingEffectiveness
+    input: [prodSalesReport, prodEngagement]
+    mesh: meshEnterprise
+
+  - id: prodAnomalyDetection
+    input: [prodDeviceHealth, prodSensorSummary, objGeo]
+    mesh: meshEnterprise
+
+  - id: prodUnifiedAnalytics
+    input: [prodBehavioralModel, prodMarketingEffectiveness, prodAnomalyDetection]
+    mesh: meshEnterprise
+
+  - id: prodRealtimeInsights
+    input: [objSensors, objSessions]
+    mesh: meshEnterprise
+
+  - id: prodAlerts
+    input: [prodRealtimeInsights, prodAnomalyDetection]
+    mesh: meshEnterprise
+
+  - id: prodDashboardA
+    input: [prodUnifiedAnalytics]
+    mesh: meshEnterprise
+
+  - id: prodDashboardB
+    input: [prodAlerts]
+    mesh: meshEnterprise
+
+  - id: prodMasterReport
+    input: [prodDashboardA, prodDashboardB]
+    mesh: meshEnterprise

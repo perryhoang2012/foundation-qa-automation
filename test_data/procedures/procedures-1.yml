@@ -1,0 +1,58 @@
+steps:
+  - type: create_mesh
+    id: mesh1
+    name: Mesh 1
+
+  - type: create_system
+    id: sys1
+    name: System 2
+
+  - type: create_source
+    id: source1
+    name: Source 1
+
+  - type: create_source
+    id: source2
+    name: Source 2
+
+  - type: link_system_to_source
+    identifier: sys1
+    child_identifier: source1
+
+  - type: configure_connection_details
+    identifier: source1
+
+  - type: set_connection_secrets
+    identifier: source1
+
+  - type: create_object
+    id: obj1
+    name: Object 1
+
+  - type: link_object_to_source
+    identifier: source1
+    child_identifier: obj1
+
+  - type: configure_object_details
+    identifier: obj1
+
+  - type: create_product
+    id: prod1
+    name: Product 1
+    mesh: mesh1
+
+  - type: create_product
+    id: prod2
+    name: Product 2
+    mesh: mesh1
+
+  - type: link_product_to_object
+    identifier: obj1
+    child_identifier: prod1
+
+  - type: link_product_to_product
+    identifier: prod1
+    child_identifier: prod2
+
+  - type: create_data_product_schema
+    identifier: prod1
