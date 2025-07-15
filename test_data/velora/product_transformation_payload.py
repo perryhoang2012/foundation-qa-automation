@@ -1,7 +1,9 @@
 import os
+from typing import List, Dict, Any, Optional
 
-def create_transformation_builder_payload(identifier = None):
-    if(identifier is not None):
+
+def create_transformation_builder_payload(identifier=None):
+    if identifier is not None:
         input_key = f"input_{identifier.replace('-', '_')}"
 
         transformation_input = {
@@ -64,29 +66,45 @@ def create_transformation_builder_payload(identifier = None):
             "preview": False,
         }
 
-def create_transformation_builder_payload_with_inputs(input_entities = None):
-    if(input_entities is not None):
+
+def create_transformation_builder_payload_with_inputs(
+    input_entities: Optional[List[Dict[str, Any]]] = None
+):
+    """
+    Create transformation builder payload with input entities.
+
+    Args:
+        input_entities: List of input entities to process
+
+    Returns:
+        Transformation builder payload configuration
+    """
+    if input_entities is not None:
         input_keys_dict = {}
         transformations = []
         for input_entity in input_entities:
             input_key = f"input_{input_entity['identifier'].replace('-', '_')}"
             input_keys_dict[input_key] = {
-                "input_type": "resource",
+                "input_type": (
+                    "resource" if input_entity.get("type") == "object" else "product"
+                ),
                 "identifier": input_entity["identifier"],
                 "preview_limit": 10,
             }
-            transformations.append({
-                "transform": "cast",
-                "input": input_key,
-                "output": "casted_columns",
-                "changes": [
+            transformations.append(
+                {
+                    "transform": "cast",
+                    "input": input_key,
+                    "output": "casted_columns",
+                    "changes": [
                         {
                             "column": "report_id",
                             "data_type": "integer",
                             "kwargs": {},
                         },
                     ],
-            })
+                }
+            )
 
         return {
             "config": {
@@ -102,7 +120,8 @@ def create_transformation_builder_payload_with_inputs(input_entities = None):
                 "driver_memory": "2048m",
             },
             "inputs": input_keys_dict,
-            "transformations": transformations + [
+            "transformations": transformations
+            + [
                 {
                     "transform": "select_columns",
                     "input": "casted_columns",

@@ -5,23 +5,26 @@ This module provides comprehensive test procedures for API automation,
 including step-by-step execution of various API operations.
 """
 
+from _pytest._code import source
 import pytest
 import os
 import sys
 import json
 import importlib.util
 from typing import Any, Dict
-from playwright.sync_api import Playwright, TimeoutError as PlaywrightTimeoutError
+import time
 
 # Add parent directory to path for imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from constants.status_check_compute import COMPLETED
 from test_data.velora.product_transformation_payload import (
     create_transformation_builder_payload_with_inputs,
 )
 from utils.common import register_entity, find_entity, record_api_info
 from constants import API_ENDPOINTS
 from steps import (
+    check_compute,
     create_mesh,
     create_system,
     create_source,
@@ -37,7 +40,14 @@ from steps import (
     set_connection_secret,
     create_transformation_builder,
     login,
+    check_status_compute,
+    get_source_by_id,
+    get_object_by_id,
+    get_product_by_id,
 )
+
+# Import mock configuration
+from tests.mock_config import create_mock_context, setup_mock_responses, mock_config
 
 # Load procedure configuration
 spec = importlib.util.spec_from_file_location(
@@ -51,42 +61,29 @@ procedure_config = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(procedure_config)
 config = procedure_config.config
 
-
 # Environment variables
 BASE_URL = os.getenv("API_URL", "http://localhost:8000")
-USERNAME = os.getenv("QA_USERNAME", "")
-PASSWORD = os.getenv("QA_PASSWORD", "")
+USERNAME = os.getenv("QA_USERNAME", "test_user")
+PASSWORD = os.getenv("QA_PASSWORD", "test_password")
 
 if config is None:
     config = {}
 
+global is_check_compute
+
 
 @pytest.fixture(scope="session")
-def api_context(playwright: Playwright):
+def api_context():
     """
     Create API request context and get access token.
-
-    Args:
-        playwright: Playwright instance for API testing
 
     Returns:
         Tuple of (context, access_token)
     """
-    context = playwright.request.new_context(base_url=BASE_URL)
-    login_payload = {"user": USERNAME, "password": PASSWORD}
-    access_token = None
+    context = create_mock_context()
+    setup_mock_responses(context, mock_config)
 
-    try:
-        response = login(context, login_payload)
-        access_token = response.json().get("access_token")
-    except PlaywrightTimeoutError:
-        context.dispose()
-        access_token = None
-    except Exception as e:
-        context.dispose()
-        access_token = None
-
-    yield context, access_token
+    yield context, mock_config.access_token
     context.dispose()
 
 
@@ -239,6 +236,9 @@ class CreateSourceStep(ProcedureStep):
             pytest.fail("input create source not found")
 
         response = create_source(context, payload, access_token, self.request)
+        print("🔍 Source response:", response)
+        print("🔍 Source response.json():", response.json())
+        print("🔍 Source response.ok:", response.ok)
         source_id = assert_entity_created(response)
         register_entity(
             self.id_map,
@@ -562,6 +562,74 @@ class CreateTransformationBuilderStep(ProcedureStep):
                 pytest.fail("product not found")
 
 
+class CheckStatusComputeStep(ProcedureStep):
+    """Step to check the status of a compute."""
+
+    def execute(self) -> None:
+        """Execute compute status checking step with retry logic."""
+        time.sleep(2)
+        context, access_token = self.api_context
+        skip_if_no_token(access_token)
+
+        entity = find_entity(self.id_map, self.step["ref"])
+        if entity is None:
+            pytest.fail("Entity not found")
+
+        entity_type = entity.get("type")
+        identifier = entity.get("identifier")
+
+        if entity_type == "source":
+            response = get_source_by_id(context, identifier, access_token, self.request)
+        elif entity_type == "object":
+            response = get_object_by_id(context, identifier, access_token, self.request)
+        elif entity_type == "product":
+            response = get_product_by_id(
+                context, identifier, access_token, self.request
+            )
+        else:
+            pytest.fail(f"Unknown entity type: {entity_type}")
+
+        if not response or not response.ok:
+            pytest.fail(
+                f"Get {entity_type} by id failed: {response.text() if response else 'No response'}"
+            )
+
+        data = response.json()
+        compute_identifier = data.get("compute_identifier")
+        healthy = data.get("healthy")
+
+        MAX_RETRIES = self.step.get("max_retries", 5)
+        DELAY_SECONDS = self.step.get("retry_interval", 60)
+
+        for attempt in range(1, MAX_RETRIES + 1):
+            print(
+                f"[CheckStatusComputeStep] Attempt {attempt}/{MAX_RETRIES} checking compute status..."
+            )
+
+            response = check_status_compute(
+                context, compute_identifier, access_token, self.request
+            )
+            assert_success_response(response)
+
+            data = response.json()
+            status = data.get("status")
+
+            if healthy and status == COMPLETED:
+                print("[CheckStatusComputeStep] Compute completed successfully.")
+                return
+
+            if attempt < MAX_RETRIES:
+                print(
+                    f"[CheckStatusComputeStep] Not completed yet. Retrying in {DELAY_SECONDS} seconds..."
+                )
+                time.sleep(DELAY_SECONDS)
+            else:
+                try:
+                    pytest.fail("Compute failed after retries: " + json.dumps(data))
+                finally:
+                    pytest.exit("Stopping all tests due to compute failure")
+
+
 def get_step_instance(
     request: Any,
     step: Dict[str, Any],
@@ -599,6 +667,7 @@ def get_step_instance(
         "configure_source": ConfigureConnectionDetailsStep,
         "set_source_secret": SetConnectionSecretsStep,
         "apply_product_transformation": CreateTransformationBuilderStep,
+        "check_status_compute": CheckStatusComputeStep,
     }
 
     if step_type not in mapping:
@@ -631,7 +700,7 @@ def test_login_api(api_context: tuple[Any, str], request: Any) -> None:
 @pytest.mark.parametrize(
     "step",
     config.get("steps", []),
-    ids=lambda x: f"Step {config.get('steps', []).index(x) + 1}: {x['type']}_{x.get('id') or x.get('identifier') or ''}",
+    ids=lambda x: f"Step {config.get('steps', []).index(x) + 1}: {x['type']}_{x.get('id') or x.get('identifier') or x.get('ref') or ''}",
 )
 def test_step_execution(
     request: Any,

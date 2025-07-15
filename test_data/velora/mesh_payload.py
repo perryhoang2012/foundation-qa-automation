@@ -1,6 +1,7 @@
 import os
 from utils.common import makeid
 
+
 def create_mesh_payload(custom_name=None):
     owner_email = os.getenv("OWNER_EMAIL", "")
     owner_name = os.getenv("OWNER_NAME", "")

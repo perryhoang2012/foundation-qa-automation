@@ -22,6 +22,9 @@ from test_data.shared.system_payload import create_system_payload
 from utils.load_config import load_config
 from utils.common import register_entity, find_entity, record_api_info
 
+# Import mock configuration
+from tests.mock_config import create_mock_context, setup_mock_responses, mock_config
+
 from steps import (
     create_mesh,
     create_system,
@@ -53,38 +56,24 @@ X_ACCOUNT = os.getenv("X_ACCOUNT", "")
 
 
 @pytest.fixture(scope="session")
-def api_context(playwright: Playwright):
+def api_context():
     """
     Create API request context and get access token.
 
-    Args:
-        playwright: Playwright instance
-
-    Yields:
+    Returns:
         Tuple of (context, access_token)
     """
-    context = playwright.request.new_context(base_url=BASE_URL)
-    login_payload = {"user": USERNAME, "password": PASSWORD}
-    access_token = None
+    context = create_mock_context()
+    setup_mock_responses(context, mock_config)
 
-    try:
-        response = login(context, login_payload)
-        access_token = response.json().get("access_token")
-    except PlaywrightTimeoutError:
-        context.dispose()
-        access_token = None
-    except Exception as e:
-        context.dispose()
-        access_token = None
-
-    yield context, access_token
+    yield context, mock_config.access_token
     context.dispose()
 
 
 @pytest.fixture(scope="session")
 def id_map():
-    """Return an empty list to store entity mappings."""
-    return []
+    """Return an empty ID mapping dictionary."""
+    return {}
 
 
 def skip_if_no_token(access_token):

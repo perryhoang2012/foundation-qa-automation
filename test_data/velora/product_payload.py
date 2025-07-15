@@ -1,6 +1,7 @@
 import os
 from utils.common import makeid
 
+
 def create_product_payload(mesh_id=None, custom_name=None):
     owner_email = os.getenv("OWNER_EMAIL", "")
     name = f"{custom_name} {makeid(2)}" if custom_name else f"Product {makeid()}"
