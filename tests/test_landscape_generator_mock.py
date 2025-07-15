@@ -25,7 +25,7 @@ from utils.common import register_entity, find_entity, record_api_info
 # Import mock configuration
 from tests.mock_config import create_mock_context, setup_mock_responses, mock_config
 
-from steps import (
+from api import (
     create_mesh,
     create_system,
     create_source,

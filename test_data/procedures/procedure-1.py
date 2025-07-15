@@ -70,6 +70,11 @@ config = {
             },
         },
         {
+            "type": "configure_object_details",
+            "ref": "object-abc",
+            "input": configure_object_payload(),
+        },
+        {
             "type": "check_status_compute",
             "ref": "object-abc",
             "max_retries": 5,

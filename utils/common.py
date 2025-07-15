@@ -1,6 +1,7 @@
 import random
 import string
 import os
+import pytest
 
 
 def makeid(length=6):
@@ -26,3 +27,58 @@ def record_api_info(request, method, url, payload, response):
         "payload": payload,
         "response": response,
     }
+
+
+def skip_if_no_token(access_token: str) -> None:
+    """
+    Skip test if no access token is available.
+
+    Args:
+        access_token: The access token to check
+    """
+    if not access_token:
+        pytest.skip("Skipping test: Access token not found")
+
+
+def assert_entity_created(response) -> str:
+    """
+    Assert that an entity was created and return its identifier.
+
+    Args:
+        response: The API response to check
+
+    Returns:
+        The identifier of the created entity
+
+    Raises:
+        pytest.fail: If the response indicates failure or missing data
+    """
+    try:
+        if not response.ok:
+            pytest.fail(f"Request failed: {response.status} - {response.text()}")
+    except Exception as e:
+        pytest.fail(f"Request failed: {e}")
+
+    entity = response.json().get("entity")
+    assert entity is not None, "Response missing 'entity'"
+    identifier = entity.get("identifier")
+    assert identifier is not None, "Entity missing 'identifier'"
+    return identifier
+
+
+def assert_success_response(response):
+    """
+    Assert that the response indicates success.
+
+    Args:
+        response: The API response to check
+
+    Raises:
+        pytest.fail: If the response indicates failure
+    """
+    try:
+        if not response.ok:
+            text = response.text()
+            pytest.fail(f"Request failed: {response.status} - {text}")
+    except Exception as e:
+        pytest.fail(f"Request failed: {e}")

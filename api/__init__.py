@@ -1,6 +1,6 @@
-from .mesh_step import get_all_mesh, create_mesh, delete_mesh
-from .system_step import get_all_system, create_system, delete_system
-from .source_step import (
+from .mesh import get_all_mesh, create_mesh, delete_mesh
+from .system import get_all_system, create_system, delete_system
+from .source import (
     get_all_source,
     create_source,
     delete_source,
@@ -9,14 +9,14 @@ from .source_step import (
     set_connection_secret,
     get_source_by_id,
 )
-from .object_step import (
+from .object import (
     get_all_object,
     create_object,
     link_object_to_source,
     config_object,
     get_object_by_id,
 )
-from .product_step import (
+from .product import (
     get_all_product,
     create_product,
     delete_product,

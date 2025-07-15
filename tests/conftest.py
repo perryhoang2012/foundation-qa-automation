@@ -11,6 +11,7 @@ from typing import Any, Dict, List
 
 import pytest
 from dotenv import load_dotenv
+import requests
 
 # Load environment variables
 load_dotenv()
@@ -167,7 +168,6 @@ def _send_webhook_notification(payload: Dict[str, Any]) -> None:
         return
 
     try:
-        import requests
 
         response = requests.post(WEBHOOK_URL, json=payload)
         response.raise_for_status()

@@ -1,19 +1,14 @@
-"""
-Test procedures generator for Velora API testing.
-
-This module provides comprehensive test procedures for API automation,
-including step-by-step execution of various API operations.
-"""
-
 import json
 import sys
 import os
 import importlib.util
 from playwright.sync_api import Playwright, TimeoutError as PlaywrightTimeoutError
 
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from steps.mesh_steps import CreateMeshStep, GetAllMeshStep
+
 from steps.check_compute import CheckStatusComputeStep
 from steps.object_steps import (
     ConfigureObjectDetailsStep,
@@ -39,13 +34,16 @@ from steps.source_steps import (
 from steps.system_steps import CreateSystemStep, GetAllSystemStep
 
 import pytest
+
+
 from utils.common import record_api_info
 from constants import API_ENDPOINTS
 
 
+
 # Load procedure configuration
 spec = importlib.util.spec_from_file_location(
-    "procedure_config", "test_data/procedures/procedure-1.py"
+    "procedure_config", "test_data/procedures_simplified/procedure-1.py"
 )
 if spec is None:
     raise FileNotFoundError("Could not load procedure configuration file")

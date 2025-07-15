@@ -5,27 +5,30 @@ This module provides comprehensive test procedures for API automation,
 including step-by-step execution of various API operations.
 """
 
-import json
 import sys
 import os
 import importlib.util
-from playwright.sync_api import Playwright, TimeoutError as PlaywrightTimeoutError
+
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from steps.mesh_steps import CreateMeshStep, GetAllMeshStep
+
 from steps.check_compute import CheckStatusComputeStep
 from steps.object_steps import (
     ConfigureObjectDetailsStep,
     CreateObjectStep,
     GetAllObjectStep,
+    GetObjectByIdStep,
     LinkObjectToSourceStep,
 )
 from steps.product_steps import (
     CreateDataProductSchemaStep,
     CreateProductStep,
     CreateTransformationBuilderStep,
+    DeleteProductStep,
     GetAllProductStep,
+    GetProductByIdStep,
     LinkProductToObjectStep,
     LinkProductToProductStep,
 )
@@ -42,6 +45,8 @@ import pytest
 from utils.common import record_api_info
 from constants import API_ENDPOINTS
 
+# Import mock configuration
+from tests.mock_config import create_mock_context, setup_mock_responses, mock_config
 
 # Load procedure configuration
 spec = importlib.util.spec_from_file_location(
@@ -67,23 +72,19 @@ global is_check_compute
 
 
 @pytest.fixture(scope="session")
-def api_context(playwright: Playwright):
-    """Create API request context and get access token"""
-    context = playwright.request.new_context(base_url=BASE_URL)
-    login_payload = {"user": USERNAME, "password": PASSWORD}
-    access_token = None
-    try:
-        response = context.post("/api/iam/login", data=json.dumps(login_payload), headers={"Content-Type": "application/json"})
-        access_token = response.json().get("access_token")
-    except PlaywrightTimeoutError:
-        context.dispose()
-        access_token = None
-    except Exception as e:
-        context.dispose()
-        access_token = None
+def api_context():
+    """
+    Create API request context and get access token.
 
-    yield context, access_token
+    Returns:
+        Tuple of (context, access_token)
+    """
+    context = create_mock_context()
+    setup_mock_responses(context, mock_config)
+
+    yield context, mock_config.access_token
     context.dispose()
+
 
 @pytest.fixture(scope="session")
 def id_map():
@@ -121,11 +122,14 @@ def get_step_instance(
         "get_all_source": GetAllSourceStep,
         "create_source": CreateSourceStep,
         "get_all_object": GetAllObjectStep,
+        "get_object_by_id": GetObjectByIdStep,
         "create_object": CreateObjectStep,
         "link_object_to_source": LinkObjectToSourceStep,
         "configure_object_details": ConfigureObjectDetailsStep,
         "get_all_product": GetAllProductStep,
+        "get_product_by_id": GetProductByIdStep,
         "create_product": CreateProductStep,
+        "delete_product": DeleteProductStep,
         "link_product_to_object": LinkProductToObjectStep,
         "link_product_to_product": LinkProductToProductStep,
         "define_product_schema": CreateDataProductSchemaStep,
