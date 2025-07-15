@@ -1,7 +1,7 @@
 import json
 
-from constants import API_ENDPOINTS
-from utils import record_api_info, get_headers
+from config import API_ENDPOINTS
+from utils.common import record_api_info, get_headers
 
 
 def get_all_product(context, access_token, request):

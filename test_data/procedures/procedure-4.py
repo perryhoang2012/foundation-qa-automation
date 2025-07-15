@@ -1,33 +1,51 @@
-import sys
-import os
-import time
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from velora import (
-    create_mesh_payload,
-    create_system_payload,
-    create_source_payload,
-    create_object_payload,
-    create_product_payload,
-    create_connection_config_payload,
-    create_connection_secret_payload,
-    schema_product_create_payload,
-    create_transformation_builder_payload_with_inputs,
-    configure_object_payload,
-)
+from test_data.velora.mesh_payload import create_mesh_payload
+from test_data.velora.system_payload import create_system_payload
+from test_data.velora.source_payload import create_source_payload
+from test_data.velora.object_payload import create_object_payload
+from test_data.velora.product_payload import create_product_payload
+from test_data.velora.connection_config_payload import create_connection_config_payload
+from test_data.velora.connection_secret_payload import create_connection_secret_payload
+from test_data.velora.schema_product_payload import schema_product_create_payload
+from test_data.velora.product_transformation_payload import create_transformation_builder_payload_with_inputs
 
 config = {
     "steps": [
         {
-            "type": "get_all_mesh",
+            "type": "create_mesh",
+            "id": "mesh-abc",
+            "input": create_mesh_payload(),
         },
-        {"type": "get_all_system"},
-        {"type": "get_all_source"},
-        {"type": "get_all_object"},
-        {"type": "get_object_by_id", "ref": "object-abc"},
-        {"type": "get_all_product"},
-        {"type": "get_product_by_id", "ref": "product-abc"},
-        {"type": "delete_product", "ref": "product-abc"},
+        {
+            "type": "create_system",
+            "id": "system-abc",
+            "input": create_system_payload(),
+        },
+        {
+            "type": "create_product",
+            "id": "product-a",
+            "mesh_ref": "mesh-abc",
+            "input": create_product_payload(),
+        },
+        {
+            "type": "get_product",
+            "input": {
+                "product_ref": "product-a"
+            }
+        },
+        {
+            "type": "delete_product",
+            "input": {
+                "product_ref": "product-a"
+            }
+        },
+           {
+            "type": "delete_mesh",
+            "input": {
+                "mesh_ref": "mesh-abc"
+            }
+        },
+        {
+            "type": "get_mesh_list",
+        },
     ],
 }

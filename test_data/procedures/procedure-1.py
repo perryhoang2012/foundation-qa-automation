@@ -1,10 +1,4 @@
-import sys
-import os
-import time
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from velora import (
+from test_data.velora import (
     create_mesh_payload,
     create_system_payload,
     create_source_payload,

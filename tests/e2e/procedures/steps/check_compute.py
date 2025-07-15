@@ -6,7 +6,7 @@ from api.check_compute import check_status_compute
 from api.source import get_source_by_id
 from api.product import get_product_by_id
 from api.object import get_object_by_id
-from constants.status_check_compute import StatusCheckCompute
+from config.status_check_compute import StatusCheckCompute
 from steps.procedure import ProcedureStep
 from utils.common import assert_success_response, find_entity, skip_if_no_token
 
@@ -16,9 +16,9 @@ class CheckStatusComputeStep(ProcedureStep):
 
     def execute(self) -> None:
         """Execute compute status checking step with retry logic."""
+        time.sleep(1)
         context, access_token = self.api_context
         skip_if_no_token(access_token)
-        time.sleep(60)
 
         entity = find_entity(self.id_map, self.step["ref"])
         if entity is None:

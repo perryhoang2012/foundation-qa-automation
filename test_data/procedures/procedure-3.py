@@ -1,10 +1,4 @@
-import sys
-import os
-import time
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from velora import (
+from test_data.velora import (
     create_mesh_payload,
     create_system_payload,
     create_source_payload,
@@ -22,11 +16,24 @@ config = {
         {
             "type": "get_all_mesh",
         },
-        {"type": "get_all_system"},
-        {"type": "get_all_source"},
-        {"type": "get_all_object"},
-        {"type": "get_object_by_id", "ref": "object-abc"},
-        {"type": "get_all_product"},
-        {"type": "get_product_by_id", "ref": "product-abc"},
+        {
+            "type": "get_all_system"
+        },
+        {
+            "type": "get_all_source"
+        },
+        {
+            "type": "get_all_object"
+        },
+        {
+            "type": "get_object_by_id", 
+            "ref": "object-abc"
+        },
+        {
+            "type": "get_all_product"
+        },
+        {
+            "type": "get_product_by_id", "ref": "product-abc"
+        },
     ],
 }

@@ -1,0 +1,79 @@
+name: Landscape Generator
+
+on:
+  schedule:
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+          pip3 install playwright
+
+      - name: Install Playwright browsers
+        run: playwright install
+
+      - name: Run Full Flow
+        id: test
+        env:
+          API_URL: ${{ vars.API_URL }}
+          DOCKER_TAG: ${{ vars.DOCKER_TAG }}
+          ORG_ID: ${{ vars.ORG_ID }}
+          OWNER_EMAIL: ${{ vars.OWNER_EMAIL }}
+          OWNER_NAME: ${{ vars.OWNER_NAME }}
+          QA_PASSWORD: ${{ vars.QA_PASSWORD }}
+          QA_USERNAME: ${{ vars.QA_USERNAME }}
+          S3_ACCESS_KEY: ${{ vars.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ vars.S3_SECRET_KEY }}
+          S3_URL: ${{ vars.S3_URL }}
+          X_ACCOUNT: ${{ vars.X_ACCOUNT }}
+          WEB_HOOK_GLUE: ${{ vars.WEB_HOOK_GLUE }}
+          ID_GROUP_GLUE: ${{ vars.ID_GROUP_GLUE }}
+        run: pytest tests/test_landscape_generator.py -v
+        continue-on-error: true
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-html-report
+          path: playwright-report/report.html
+          retention-days: 30
+
+      - name: Get Artifact ID
+        id: get_artifact
+        run: |
+          ARTIFACT_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts | \
+            jq -r '.artifacts[] | select(.name=="playwright-html-report") | .id')
+
+          echo "artifact_id=$ARTIFACT_ID" >> $GITHUB_OUTPUT
+
+      - name: Send Result Link to GlueGroups Webhook
+        if: ${{ !cancelled() }}
+        env:
+          WEBHOOK_URL: ${{ vars.WEB_HOOK_GLUE }}
+          TARGET_ID: ${{ vars.ID_GROUP_GLUE }}
+        run: |
+          ARTIFACT_ID="${{ steps.get_artifact.outputs.artifact_id }}"
+          RUN_ID="${{ github.run_id }}"
+          REPO_URL="https://github.com/${{ github.repository }}"
+          ARTIFACT_LINK="$REPO_URL/actions/runs/$RUN_ID/artifacts/$ARTIFACT_ID"
+
+          curl -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg target "$TARGET_ID" \
+              --arg text "📎 [View full report]($ARTIFACT_LINK)" \
+              '{target: $target, text: $text}')"
