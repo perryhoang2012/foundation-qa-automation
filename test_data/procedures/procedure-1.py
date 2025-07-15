@@ -1,17 +1,15 @@
-import sys
-import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from test_data.velora.mesh_payload import create_mesh_payload
-from test_data.velora.system_payload import create_system_payload
-from test_data.velora.source_payload import create_source_payload
-from test_data.velora.object_payload import create_object_payload
-from test_data.velora.product_payload import create_product_payload
-from test_data.velora.connection_config_payload import create_connection_config_payload
-from test_data.velora.connection_secret_payload import create_connection_secret_payload
-from test_data.velora.schema_product_payload import schema_product_create_payload
-from test_data.velora.product_transformation_payload import create_transformation_builder_payload_with_inputs
+from test_data.velora import (
+    create_mesh_payload,
+    create_system_payload,
+    create_source_payload,
+    create_object_payload,
+    create_product_payload,
+    create_connection_config_payload,
+    create_connection_secret_payload,
+    schema_product_create_payload,
+    create_transformation_builder_payload_with_inputs,
+    configure_object_payload,
+)
 
 config = {
     "steps": [
@@ -48,6 +46,12 @@ config = {
             "input": create_connection_secret_payload(),
         },
         {
+            "type": "check_status_compute",
+            "ref": "source-abc",
+            "max_retries": 5,
+            "retry_interval": 10,
+        },
+        {
             "type": "create_object",
             "id": "object-abc",
             "input": create_object_payload(),
@@ -60,12 +64,23 @@ config = {
             },
         },
         {
+            "type": "configure_object_details",
+            "ref": "object-abc",
+            "input": configure_object_payload(),
+        },
+        {
+            "type": "check_status_compute",
+            "ref": "object-abc",
+            "max_retries": 5,
+            "retry_interval": 10,
+        },
+        {
             "type": "create_product",
             "id": "product-abc",
             "mesh_ref": "mesh-abc",
             "input": create_product_payload(),
         },
-         {
+        {
             "type": "link_product_to_object",
             "input": {
                 "object_ref": "object-abc",
@@ -84,6 +99,12 @@ config = {
                 "input_refs": ["object-abc"],
                 "transformation": create_transformation_builder_payload_with_inputs(),
             },
+        },
+        {
+            "type": "check_status_compute",
+            "ref": "product-abc",
+            "max_retries": 5,
+            "retry_interval": 10,
         },
     ],
 }

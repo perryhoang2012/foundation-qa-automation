@@ -1,11 +1,8 @@
-import sys
 import os
 import pytest
 from dotenv import load_dotenv
 from playwright.sync_api import Playwright, TimeoutError as PlaywrightTimeoutError
 import json
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils.load_config import load_config
 from test_data.shared.mesh_payload import create_mesh_payload

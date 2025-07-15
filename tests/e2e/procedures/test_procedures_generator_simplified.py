@@ -1,12 +1,10 @@
 import pytest
 import os
-import sys
 import json
 from types import FunctionType
 from playwright.sync_api import Playwright, TimeoutError as PlaywrightTimeoutError
 
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.load_config import load_config
 from test_data.shared.mesh_payload import create_mesh_payload
 from test_data.shared.system_payload import create_system_payload
@@ -312,8 +310,6 @@ class SetConnectionSecretsStep(ProcedureStep):
             record_api_info(self.req_context, "POST", url, payload, response)
             assert_success_response(response)
 
-# ---------------------------
-# Phần 2: Hàm lấy instance lớp tương ứng với step type
 
 def get_step_instance(step, api_context, id_map, req_context):
     step_type = step.get("type")

@@ -1,8 +1,3 @@
-import sys
-import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from test_data.velora.mesh_payload import create_mesh_payload
 from test_data.velora.system_payload import create_system_payload
 from test_data.velora.source_payload import create_source_payload
