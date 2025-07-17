@@ -43,7 +43,7 @@ def get_source_by_id(context, source_id, access_token, request):
     Returns:
         API response containing the source resource
     """
-    url = f"{API_ENDPOINTS['SOURCE']}/{source_id}"
+    url = f"{API_ENDPOINTS['SOURCE']}?identifier={source_id}"
     headers = get_headers(access_token)
 
     response = context.get(url, headers=headers)

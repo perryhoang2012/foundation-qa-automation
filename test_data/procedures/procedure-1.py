@@ -55,7 +55,7 @@ config = {
             "type": "check_status_compute",
             "ref": "source-abc",
             "max_retries": 5,
-            "retry_interval": 10,
+            "retry_interval": 20,
         },
         {
             "type": "create_object",
@@ -84,7 +84,7 @@ config = {
             "type": "check_status_compute",
             "ref": "object-abc",
             "max_retries": 5,
-            "retry_interval": 10,
+            "retry_interval": 15,
         },
         {
             "type": "create_product",
@@ -122,7 +122,7 @@ config = {
             "type": "check_status_compute",
             "ref": "product-abc",
             "max_retries": 5,
-            "retry_interval": 10,
+            "retry_interval": 30,
         },
     ],
 }

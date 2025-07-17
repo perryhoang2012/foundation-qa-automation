@@ -13,11 +13,13 @@ playwright install
 ## Run Test
 
 ### Run all tests
+
 ```bash
 pytest
 ```
 
 ### Run one test
+
 ```bash
 pytest tests/test_landscape_generator.py
 ```

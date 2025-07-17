@@ -59,12 +59,11 @@ class GetSourceByIdStep(ProcedureStep):
         source_id = entity["identifier"]
         if not source_id:
             pytest.fail("Response from get_source_by_id does not contain 'identifier'.")
+        
         register_entity(
             self.id_map,
             {
                 **response_data,
-                "compute_identifier": response_data.get("compute_identifier"),
-                "healthy": response_data.get("healthy"),
                 "id": source_ref,
             },
         )
