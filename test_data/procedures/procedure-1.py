@@ -46,6 +46,12 @@ config = {
             "input": create_connection_secret_payload(),
         },
         {
+            "type": "get_source_by_id",
+            "input": {
+                "source_ref": "source-abc",
+            },
+        },
+        {
             "type": "check_status_compute",
             "ref": "source-abc",
             "max_retries": 5,
@@ -67,6 +73,12 @@ config = {
             "type": "configure_object_details",
             "ref": "object-abc",
             "input": configure_object_payload(),
+        },
+        {
+            "type": "get_object_by_id",
+            "input": {
+                "object_ref": "object-abc",
+            },
         },
         {
             "type": "check_status_compute",
@@ -98,6 +110,12 @@ config = {
                 "product_ref": "product-abc",
                 "input_refs": ["object-abc"],
                 "transformation": create_transformation_builder_payload_with_inputs(),
+            },
+        },
+        {
+            "type": "get_product_by_id",
+            "input": {
+                "product_ref": "product-abc",
             },
         },
         {

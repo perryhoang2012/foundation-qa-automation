@@ -40,6 +40,11 @@ from steps.source_steps import (
 from steps.system_steps import CreateSystemStep, GetAllSystemStep
 
 import pytest
+from tests.e2e.procedures.mock_config import (
+    create_mock_context,
+    setup_mock_responses,
+    mock_config,
+)
 from utils.common import record_api_info
 from config import API_ENDPOINTS
 
@@ -68,26 +73,17 @@ global is_check_compute
 
 
 @pytest.fixture(scope="session")
-def api_context(playwright: Playwright):
-    """Create API request context and get access token"""
-    context = playwright.request.new_context(base_url=BASE_URL)
-    login_payload = {"user": USERNAME, "password": PASSWORD}
-    access_token = None
-    try:
-        response = context.post(
-            "/api/iam/login",
-            data=json.dumps(login_payload),
-            headers={"Content-Type": "application/json"},
-        )
-        access_token = response.json().get("access_token")
-    except PlaywrightTimeoutError:
-        context.dispose()
-        access_token = None
-    except Exception as e:
-        context.dispose()
-        access_token = None
+def api_context():
+    """
+    Create API request context and get access token.
 
-    yield context, access_token
+    Returns:
+        Tuple of (context, access_token)
+    """
+    context = create_mock_context()
+    setup_mock_responses(context, mock_config)
+
+    yield context, mock_config.access_token
     context.dispose()
 
 
@@ -193,3 +189,4 @@ def test_step_execution(
         id_map: The entity ID mapping dictionary
     """
     get_step_instance(request, step, api_context, id_map).execute()
+    print(id_map)

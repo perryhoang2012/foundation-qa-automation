@@ -48,14 +48,18 @@ class DeleteMeshStep(ProcedureStep):
     """Step to delete a mesh entity."""
 
     def execute(self) -> None:
-        """Execute mesh deletion step."""
+        """Execute the mesh deletion step."""
         print("▶️ delete_mesh_logic", self.step)
         context, access_token = self.api_context
         skip_if_no_token(access_token)
 
-        if "ref" in self.step:
-            ref = self.step["ref"]
-        else:
-            pytest.fail("input delete mesh not found")
+        mesh_ref = self.step.get("input", {}).get("mesh_ref")
+        if not mesh_ref:
+            pytest.fail("Mesh reference ('mesh_ref') is required for deletion.")
 
-        response = delete_mesh(context, ref, access_token, self.request)
+        mesh_entry = self.id_map.get(mesh_ref)
+        if not mesh_entry or "identifier" not in mesh_entry:
+            pytest.fail("Mesh reference ('mesh_ref') not found in id_map.")
+        mesh_id = mesh_entry["identifier"]
+
+        response = delete_mesh(context, mesh_id, access_token, self.request)

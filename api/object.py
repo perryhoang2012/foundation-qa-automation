@@ -32,7 +32,7 @@ def get_all_object(context, access_token, request):
     return response
 
 
-def get_object_by_id(context, access_token, object_id, request):
+def get_object_by_id(context, object_id, access_token, request):
     """
     Retrieve a data object by its identifier.
     """

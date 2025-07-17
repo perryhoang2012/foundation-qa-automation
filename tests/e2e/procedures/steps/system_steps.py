@@ -48,9 +48,13 @@ class DeleteSystemStep(ProcedureStep):
         context, access_token = self.api_context
         skip_if_no_token(access_token)
 
-        if "ref" in self.step:
-            ref = self.step["ref"]
-        else:
-            pytest.fail("input delete system not found")
+        system_ref = self.step.get("input", {}).get("system_ref")
+        if not system_ref:
+            pytest.fail("System reference ('system_ref') is required for deletion.")
 
-        response = delete_system(context, ref, access_token, self.request)
+        system_entry = self.id_map.get(system_ref)
+        if not system_entry or "identifier" not in system_entry:
+            pytest.fail("System reference ('system_ref') not found in id_map.")
+        system_id = system_entry["identifier"]
+
+        response = delete_system(context, system_id, access_token, self.request)

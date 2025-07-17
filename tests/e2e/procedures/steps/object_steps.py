@@ -39,12 +39,35 @@ class GetObjectByIdStep(ProcedureStep):
         context, access_token = self.api_context
         skip_if_no_token(access_token)
 
-        if "ref" in self.step:
-            payload = self.step["ref"]
-        else:
-            pytest.fail("input get object by id not found")
+        object_ref = self.step.get("input", {}).get("object_ref")
+        if not object_ref:
+            pytest.fail("Missing required input: 'object_ref'.")
 
-        response = get_object_by_id(context, access_token, payload, self.request)
+        object_entry = self.id_map.get(object_ref)
+        if not object_entry or "identifier" not in object_entry:
+            pytest.fail(f"'object_ref' '{object_ref}' not found in id_map.")
+
+        object_id = object_entry["identifier"]
+        response = get_object_by_id(context, object_id, access_token, self.request)
+
+        if not hasattr(response, "json"):
+            pytest.fail("Response object does not have a .json() method.")
+
+        response_data = response.json()
+        entity = response_data.get("entity")
+
+        if not entity or "identifier" not in entity:
+            pytest.fail("Invalid response: missing 'entity' or 'identifier' field.")
+
+        register_entity(
+            self.id_map,
+            {
+                **response_data,
+                "id": object_ref,
+                "compute_identifier": response_data.get("compute_identifier"),
+                "healthy": response_data.get("healthy"),
+            },
+        )
 
 
 class CreateObjectStep(ProcedureStep):
@@ -78,12 +101,32 @@ class DeleteObjectStep(ProcedureStep):
         context, access_token = self.api_context
         skip_if_no_token(access_token)
 
-        if "ref" in self.step:
-            ref = self.step["ref"]
-        else:
-            pytest.fail("input delete object not found")
+        object_ref = self.step.get("input", {}).get("object_ref")
+        if not object_ref:
+            pytest.fail("Object reference ('object_ref') is required for retrieval.")
 
-        response = delete_object(context, ref, access_token, self.request)
+        object_entry = self.id_map.get(object_ref)
+        if not object_entry or "identifier" not in object_entry:
+            pytest.fail("Object reference ('object_ref') not found in id_map.")
+        object_id = object_entry["identifier"]
+        response = get_object_by_id(context, object_id, access_token, self.request)
+        entity = response.json().get("entity") if hasattr(response, "json") else None
+        if not entity or "identifier" not in entity:
+            pytest.fail(
+                "Response from get_object_by_id does not contain 'entity' or 'identifier'."
+            )
+        object_id = entity["identifier"]
+
+        if not object_id:
+            pytest.fail("Response from get_object_by_id does not contain 'identifier'.")
+        register_entity(
+            self.id_map,
+            {
+                "compute_identifier": entity.get("compute_identifier"),
+                "healthy": entity.get("healthy"),
+                "id": object_ref,
+            },
+        )
 
 
 class LinkObjectToSourceStep(ProcedureStep):

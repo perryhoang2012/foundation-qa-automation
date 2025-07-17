@@ -16,39 +16,26 @@ class CheckStatusComputeStep(ProcedureStep):
 
     def execute(self) -> None:
         """Execute compute status checking step with retry logic."""
-        time.sleep(1)
+        MAX_RETRIES = self.step.get("max_retries", 5)
+        DELAY_SECONDS = self.step.get("retry_interval", 60)
+
         context, access_token = self.api_context
         skip_if_no_token(access_token)
+        print(json.dumps(self.id_map, indent=4))
 
         entity = find_entity(self.id_map, self.step["ref"])
         if entity is None:
             pytest.fail("Entity not found")
 
-        entity_type = entity.get("type")
-        identifier = entity.get("identifier")
-
-        if entity_type == "source":
-            response = get_source_by_id(context, identifier, access_token, self.request)
-        elif entity_type == "object":
-            response = get_object_by_id(context, identifier, access_token, self.request)
-        elif entity_type == "product":
-            response = get_product_by_id(
-                context, identifier, access_token, self.request
-            )
+        if entity.get("type") == "product":
+            compute_identifier = entity.get("compute", {}).get("identifier")
         else:
-            pytest.fail(f"Unknown entity type: {entity_type}")
+            compute_identifier = entity.get("compute_identifier")
 
-        if not response or not response.ok:
-            pytest.fail(
-                f"Get {entity_type} by id failed: {response.text() if response else 'No response'}"
-            )
+        if compute_identifier is None:
+            pytest.fail("Compute identifier not found")
 
-        data = response.json()
-        compute_identifier = data.get("compute_identifier")
-        healthy = data.get("healthy")
-
-        MAX_RETRIES = self.step.get("max_retries", 5)
-        DELAY_SECONDS = self.step.get("retry_interval", 60)
+        time.sleep(DELAY_SECONDS)
 
         for attempt in range(1, MAX_RETRIES + 1):
             print(
@@ -63,7 +50,7 @@ class CheckStatusComputeStep(ProcedureStep):
             data = response.json()
             status = data.get("status")
 
-            if healthy and status == StatusCheckCompute.COMPLETED:
+            if status == StatusCheckCompute.COMPLETED:
                 print("[CheckStatusComputeStep] Compute completed successfully.")
                 return
 

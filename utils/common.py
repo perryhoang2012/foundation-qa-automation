@@ -5,6 +5,7 @@ import pytest
 
 X_ACCOUNT = os.getenv("X_ACCOUNT", "")
 
+
 def makeid(length=6):
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
@@ -20,7 +21,10 @@ def get_headers(token):
 def register_entity(id_map, entity):
     key = entity.get("id") or entity.get("identifier")
     if key is not None:
-        id_map[key] = entity
+        if key in id_map:
+            id_map[key].update(entity)
+        else:
+            id_map[key] = entity
     else:
         raise ValueError("Entity must have 'id' or 'identifier'")
 

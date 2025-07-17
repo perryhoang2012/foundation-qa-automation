@@ -40,16 +40,32 @@ class GetProductByIdStep(ProcedureStep):
 
     def execute(self) -> None:
         """Execute product retrieval step."""
-        print("▶️ get_product_by_id_logic", self.step)
         context, access_token = self.api_context
         skip_if_no_token(access_token)
 
-        if "ref" in self.step:
-            product_id = self.step["ref"]
-        else:
-            pytest.fail("input get product by id not found")
+        product_ref = self.step.get("input", {}).get("product_ref")
+        if not product_ref:
+            pytest.fail("Missing required input: 'product_ref'.")
 
+        product_entry = self.id_map.get(product_ref)
+        if not product_entry or "identifier" not in product_entry:
+            pytest.fail(f"'product_ref' '{product_ref}' not found in id_map.")
+
+        product_id = product_entry["identifier"]
         response = get_product_by_id(context, product_id, access_token, self.request)
+        response_data = response.json()
+        entity = response_data.get("entity")
+
+        if not entity or "identifier" not in entity:
+            pytest.fail("Invalid response: missing 'entity' or 'identifier' field.")
+
+        register_entity(
+            self.id_map,
+            {
+                **response_data,
+                "id": product_ref,
+            },
+        )
 
 
 class CreateProductStep(ProcedureStep):
@@ -90,10 +106,14 @@ class DeleteProductStep(ProcedureStep):
         context, access_token = self.api_context
         skip_if_no_token(access_token)
 
-        if "ref" in self.step:
-            product_id = self.step["ref"]
-        else:
-            pytest.fail("input delete product not found")
+        product_ref = self.step.get("input", {}).get("product_ref")
+        if not product_ref:
+            pytest.fail("Product reference ('product_ref') is required for deletion.")
+
+        product_entry = self.id_map.get(product_ref)
+        if not product_entry or "identifier" not in product_entry:
+            pytest.fail("Product reference ('product_ref') not found in id_map.")
+        product_id = product_entry["identifier"]
 
         response = delete_product(context, product_id, access_token, self.request)
 
