@@ -14,10 +14,15 @@ from utils.common import assert_success_response, find_entity, skip_if_no_token
 class CheckStatusComputeStep(ProcedureStep):
     """Step to check the status of a compute."""
 
+    
+
     def execute(self) -> None:
+        DEFAULT_NUM_RETRIES = 5
+        DEFAULT_DELAY_SECONDS = 60
+
         """Execute compute status checking step with retry logic."""
-        MAX_RETRIES = self.step.get("max_retries", 5)
-        DELAY_SECONDS = self.step.get("retry_interval", 60)
+        MAX_RETRIES = self.step.get("max_retries", DEFAULT_NUM_RETRIES)
+        DELAY_SECONDS = self.step.get("retry_interval", DEFAULT_DELAY_SECONDS)
 
         context, access_token = self.api_context
         skip_if_no_token(access_token)
@@ -31,26 +36,26 @@ class CheckStatusComputeStep(ProcedureStep):
             compute_identifier = entity.get("compute", {}).get("identifier")
         else:
             compute_identifier = entity.get("compute_identifier")
+        healthy = entity.get("healthy")
 
         if compute_identifier is None:
             pytest.fail("Compute identifier not found")
 
         time.sleep(DELAY_SECONDS)
-
         for attempt in range(1, MAX_RETRIES + 1):
             print(
                 f"[CheckStatusComputeStep] Attempt {attempt}/{MAX_RETRIES} checking compute status..."
             )
-
             response = check_status_compute(
                 context, compute_identifier, access_token, self.request
             )
             assert_success_response(response)
 
             data = response.json()
+            print('datayo', data)
             status = data.get("status")
 
-            if status == StatusCheckCompute.COMPLETED:
+            if status.get('status') == StatusCheckCompute.COMPLETED.value:
                 print("[CheckStatusComputeStep] Compute completed successfully.")
                 return
 
@@ -60,7 +65,6 @@ class CheckStatusComputeStep(ProcedureStep):
                 )
                 time.sleep(DELAY_SECONDS)
             else:
-                try:
-                    pytest.fail("Compute failed after retries: " + json.dumps(data))
-                finally:
-                    pytest.exit("Stopping all tests due to compute failure")
+                pytest.fail("Compute failed after retries")
+              
+        

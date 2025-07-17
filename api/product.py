@@ -104,8 +104,8 @@ def link_product_to_object(
     url = API_ENDPOINTS["LINK_PRODUCT_TO_OBJECT"]
     headers = get_headers(access_token)
     params = {
-        "identifier": product_entity["identifier"],
-        "child_identifier": object_entity["identifier"],
+        "identifier": object_entity["identifier"],
+        "child_identifier": product_entity["identifier"],
     }
 
     response = context.post(url, params=params, headers=headers)

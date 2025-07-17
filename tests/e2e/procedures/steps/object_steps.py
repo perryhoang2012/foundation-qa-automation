@@ -54,6 +54,7 @@ class GetObjectByIdStep(ProcedureStep):
             pytest.fail("Response object does not have a .json() method.")
 
         response_data = response.json()
+        print('yoyo', response_data)
         entity = response_data.get("entity")
 
         if not entity or "identifier" not in entity:
@@ -64,8 +65,6 @@ class GetObjectByIdStep(ProcedureStep):
             {
                 **response_data,
                 "id": object_ref,
-                "compute_identifier": response_data.get("compute_identifier"),
-                "healthy": response_data.get("healthy"),
             },
         )
 
