@@ -16,13 +16,13 @@ def product_excavation_progress_builder_payload():
             "driver_core_limit": "800m",
             "driver_memory": "2048m",
         },
-        "input_refs": ["product-abc", "product-def"],
+        "input_refs": ["sadp-1", "sadp-2"],
         "transformations": [
             {
                 "transform": "join_rename_select",
-                "input_ref": "product-abc",
+                "input_ref": "sadp-1",
                 "output": "joined_data",
-                "other_ref": "product-def",
+                "other_ref": "sadp-2",
                 "join": "inner",
                 "conditions": [
                     {"left": "report_id", "operator": "eq", "right": "report_id"}

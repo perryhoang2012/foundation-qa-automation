@@ -16,11 +16,11 @@ def product_daily_reports_builder_payload():
             "driver_core_limit": "800m",
             "driver_memory": "2048m",
         },
-        "input_refs": ["object-abc"],
+        "input_refs": ["object-1"],
         "transformations": [
             {
                 "transform": "cast",
-                "input_ref": "object-abc",
+                "input_ref": "object-1",
                 "output": "casted_columns",
                 "changes": [
                     {"column": "report_id", "data_type": "integer", "kwargs": {}}

@@ -98,7 +98,7 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: pytest.ExitCode) -
     payload = {"text": summary, "target": TARGET_WEBHOOK}
 
     # Send webhook notification (commented out for now)
-    # _send_webhook_notification(payload)
+    _send_webhook_notification(payload)
 
 
 def _generate_test_summary(

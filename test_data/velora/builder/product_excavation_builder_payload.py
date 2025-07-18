@@ -16,11 +16,11 @@ def product_excavation_builder_payload():
             "driver_core_limit": "800m",
             "driver_memory": "2048m",
         },
-        "inputs": ["object-def"],
+        "inputs": ["object-2"],
         "transformations": [
             {
                 "transform": "cast",
-                "input_ref": "object-def",
+                "input_ref": "object-2",
                 "output": "casted_columns",
                 "changes": [
                     {"column": "excavation_id", "data_type": "integer", "kwargs": {}},

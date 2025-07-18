@@ -13,7 +13,7 @@ def create_product_excavation_progress_payload():
             "description": "Aggregates excavation performance data, including daily and planned excavation volumes, variances, and cumulative progress metrics for tracking excavation project efficiency.",
         },
         "host_mesh_identifier": "",
-        "mesh_ref": "mesh-abc",
+        "mesh_ref": "mesh-1",
         "entity_info": {
             "owner": owner_email,
             "contact_ids": [],

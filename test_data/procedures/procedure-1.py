@@ -17,214 +17,240 @@ from test_data.velora import (
     product_daily_reports_builder_payload,
     product_excavation_builder_payload,
     product_excavation_progress_builder_payload,
+    create_object_daily_reports_payload,
+    create_object_excavation_payload,
+    configure_object_daily_reports_payload,
+    configure_object_excavation_payload,
+    create_product_daily_reports_payload,
+    create_product_excavation_payload,
+    create_product_excavation_progress_payload,
+    schema_product_daily_reports_payload,
+    schema_product_excavation_payload,
+    schema_product_excavation_progress_payload,
+    product_daily_reports_builder_payload,
+    product_excavation_builder_payload,
+    product_excavation_progress_builder_payload,
 )
 
 config = {
     "steps": [
+        # Mesh
         {
             "type": "create_mesh",
-            "id": "mesh-abc",
+            "id": "mesh-1",
             "input": create_mesh_payload(),
         },
+        # System
         {
             "type": "create_system",
-            "id": "system-abc",
+            "id": "system-1",
             "input": create_system_payload(),
         },
+        # Source
         {
             "type": "create_source",
-            "id": "source-abc",
+            "id": "source-1",
             "input": create_source_payload(),
         },
         {
             "type": "link_system_to_source",
             "input": {
-                "system_ref": "system-abc",
-                "source_ref": "source-abc",
+                "system_ref": "system-1",
+                "source_ref": "source-1",
             },
         },
         {
             "type": "configure_source",
-            "ref": "source-abc",
+            "ref": "source-1",
             "input": create_connection_config_payload(),
         },
         {
             "type": "set_source_secret",
-            "ref": "source-abc",
+            "ref": "source-1",
             "input": create_connection_secret_payload(),
         },
         {
             "type": "get_source_by_id",
             "input": {
-                "source_ref": "source-abc",
+                "source_ref": "source-1",
             },
         },
         {
             "type": "check_status_compute",
-            "ref": "source-abc",
-            "max_retries": 5,
+            "ref": "source-1",
+            "max_retries": 10,
             "retry_interval": 20,
         },
+        # Object 1
         {
             "type": "create_object",
-            "id": "object-abc",
+            "id": "object-1",
             "input": create_object_daily_reports_payload(),
         },
         {
+            "type": "link_object_to_source",
+            "input": {
+                "source_ref": "source-1",
+                "object_ref": "object-1",
+            },
+        },
+        {
+            "type": "configure_object_details",
+            "ref": "object-1",
+            "input": configure_object_daily_reports_payload(),
+        },
+        {
+            "type": "get_object_by_id",
+            "input": {
+                "object_ref": "object-1",
+            },
+        },
+        {
+            "type": "check_status_compute",
+            "ref": "object-1",
+            "max_retries": 10,
+            "retry_interval": 20,
+        },
+        # Object 2
+        {
             "type": "create_object",
-            "id": "object-def",
+            "id": "object-2",
             "input": create_object_excavation_payload(),
         },
         {
             "type": "link_object_to_source",
             "input": {
-                "source_ref": "source-abc",
-                "object_ref": "object-abc",
+                "source_ref": "source-1",
+                "object_ref": "object-2",
             },
         },
         {
             "type": "link_object_to_source",
             "input": {
-                "source_ref": "source-abc",
-                "object_ref": "object-def",
+                "source_ref": "source-1",
+                "object_ref": "object-2",
             },
         },
         {
             "type": "configure_object_details",
-            "ref": "object-abc",
-            "input": configure_object_daily_reports_payload(),
-        },
-        {
-            "type": "configure_object_details",
-            "ref": "object-def",
+            "ref": "object-2",
             "input": configure_object_excavation_payload(),
         },
         {
             "type": "get_object_by_id",
             "input": {
-                "object_ref": "object-abc",
-            },
-        },
-        {
-            "type": "get_object_by_id",
-            "input": {
-                "object_ref": "object-def",
+                "object_ref": "object-2",
             },
         },
         {
             "type": "check_status_compute",
-            "ref": "object-abc",
-            "max_retries": 5,
-            "retry_interval": 15,
+            "ref": "object-2",
+            "max_retries": 10,
+            "retry_interval": 20,
         },
-        {
-            "type": "check_status_compute",
-            "ref": "object-def",
-            "max_retries": 5,
-            "retry_interval": 15,
-        },
+        # SADP 1
         {
             "type": "create_product",
-            "id": "product-abc",
+            "id": "sadp-1",
             "input": create_product_daily_reports_payload(),
         },
         {
-            "type": "create_product",
-            "id": "product-def",
-            "input": create_product_excavation_payload(),
-        },
-        {
-            "type": "create_product",
-            "id": "product-gkh",
-            "input": create_product_excavation_progress_payload(),
-        },
-        {
             "type": "link_product_to_object",
             "input": {
-                "object_ref": "object-abc",
-                "product_ref": "product-abc",
-            },
-        },
-        {
-            "type": "link_product_to_object",
-            "input": {
-                "object_ref": "object-def",
-                "product_ref": "product-def",
-            },
-        },
-        {
-            "type": "link_product_to_product",
-            "input": {
-                "product_ref": "product-abc",
-                "product_child_ref": "product-gkh",
-            },
-        },
-        {
-            "type": "link_product_to_product",
-            "input": {
-                "product_ref": "product-def",
-                "product_child_ref": "product-gkh",
+                "object_ref": "object-1",
+                "product_ref": "sadp-1",
             },
         },
         {
             "type": "define_product_schema",
-            "ref": "product-abc",
+            "ref": "sadp-1",
             "input": schema_product_daily_reports_payload(),
         },
         {
-            "type": "define_product_schema",
-            "ref": "product-def",
-            "input": schema_product_excavation_payload(),
+            "type": "apply_product_transformation",
+            "input": {
+                "product_ref": "sadp-1",
+                "transformations": product_daily_reports_builder_payload(),
+            },
+        },
+        {
+            "type": "get_product_by_id",
+            "input": {
+                "product_ref": "sadp-1",
+            },
+        },
+        {
+            "type": "check_status_compute",
+            "ref": "sadp-1",
+            "max_retries": 10,
+            "retry_interval": 20,
+        },
+        # SADP 2
+        {
+            "type": "create_product",
+            "id": "sadp-2",
+            "input": create_product_excavation_payload(),
+        },
+        {
+            "type": "link_product_to_object",
+            "input": {
+                "object_ref": "object-2",
+                "product_ref": "sadp-2",
+            },
         },
         {
             "type": "define_product_schema",
-            "ref": "product-gkh",
+            "ref": "sadp-2",
+            "input": schema_product_excavation_payload(),
+        },
+        {
+            "type": "apply_product_transformation",
+            "input": {
+                "product_ref": "sadp-2",
+                "transformations": product_excavation_builder_payload(),
+            },
+        },
+        {
+            "type": "get_product_by_id",
+            "input": {
+                "product_ref": "sadp-2",
+            },
+        },
+        {
+            "type": "check_status_compute",
+            "ref": "sadp-2",
+            "max_retries": 10,
+            "retry_interval": 20,
+        },
+        # CADP
+        {
+            "type": "create_product",
+            "id": "cadp",
+            "input": create_product_excavation_progress_payload(),
+        },
+        {
+            "type": "define_product_schema",
+            "ref": "cadp",
             "input": schema_product_excavation_progress_payload(),
         },
         {
             "type": "apply_product_transformation",
             "input": {
-                "product_ref": "product-abc",
-                "transformations": product_daily_reports_builder_payload(),
-            },
-        },
-        {
-            "type": "apply_product_transformation",
-            "input": {
-                "product_ref": "product-def",
-                "transformations": product_excavation_builder_payload(),
-            },
-        },
-        {
-            "type": "apply_product_transformation",
-            "input": {
-                "product_ref": "product-gkh",
+                "product_ref": "cadp",
                 "transformations": product_excavation_progress_builder_payload(),
             },
         },
         {
             "type": "get_product_by_id",
             "input": {
-                "product_ref": "product-abc",
-            },
-        },
-        {
-            "type": "get_product_by_id",
-            "input": {
-                "product_ref": "product-def",
-            },
-        },
-        {
-            "type": "get_product_by_id",
-            "input": {
-                "product_ref": "product-gkh",
+                "product_ref": "cadp",
             },
         },
         {
             "type": "check_status_compute",
-            "ref": "product-abc",
-            "max_retries": 5,
-            "retry_interval": 30,
+            "ref": "cadp",
+            "max_retries": 10,
+            "retry_interval": 20,
         },
     ],
 }

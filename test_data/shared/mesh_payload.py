@@ -2,8 +2,8 @@ import os
 from utils.common import makeid
 
 def create_mesh_payload(custom_name=None):
-    owner_email = os.getenv("OWNER_EMAIL", "")
-    owner_name = os.getenv("OWNER_NAME", "")
+    owner_email = os.getenv("OWNER_EMAIL", "test@example.com")  # Default email for testing
+    owner_name = os.getenv("OWNER_NAME", "Test User")  # Default name for testing
     name = f"{custom_name} {makeid(2)}" if custom_name else f"Mesh {makeid()}"
     return {
         "entity": {
