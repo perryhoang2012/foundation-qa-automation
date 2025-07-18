@@ -11,9 +11,7 @@ from api.product import (
     link_product_to_product,
 )
 from steps.procedure import ProcedureStep
-from test_data.velora.product_transformation_payload import (
-    create_transformation_builder_payload_with_inputs,
-)
+
 from utils.common import (
     assert_entity_created,
     assert_success_response,
@@ -77,16 +75,17 @@ class CreateProductStep(ProcedureStep):
         context, access_token = self.api_context
         skip_if_no_token(access_token)
 
-        mesh = None
-        if "input" in self.step:
-            payload = self.step["input"]
-        else:
-            pytest.fail("input create product not found")
+        payload = self.step.get("input")
+        if not payload:
+            pytest.fail("Input for creating product not found.")
 
-        if self.step.get("mesh_ref"):
-            mesh = find_entity(self.id_map, self.step["mesh_ref"])
-            if mesh is not None:
-                payload["host_mesh_identifier"] = mesh["identifier"]
+        # Get host mesh identifier from payload
+        mesh_ref = payload.pop("mesh_ref", None)
+        if mesh_ref:
+            mesh_entity = find_entity(self.id_map, mesh_ref)
+            if not mesh_entity:
+                pytest.fail(f"Mesh entity not found for identifier: {mesh_ref}")
+            payload["host_mesh_identifier"] = mesh_entity["identifier"]
 
         response = create_product(context, payload, access_token, self.request)
         product_id = assert_entity_created(response)
@@ -216,34 +215,65 @@ class CreateTransformationBuilderStep(ProcedureStep):
         context, access_token = self.api_context
         skip_if_no_token(access_token)
 
-        if "input" in self.step:
-            if self.step["input"].get("product_ref"):
-                product_entity = find_entity(
-                    self.id_map, self.step["input"].get("product_ref")
-                )
-            if self.step["input"].get("input_refs"):
-                input_entities = []
-                for input_ref in self.step["input"].get("input_refs"):
-                    input_entity = find_entity(self.id_map, input_ref)
-                    if input_entity:
-                        input_entities.append(input_entity)
-                    else:
-                        pytest.fail(f"input {input_ref} not found")
+        step_input = self.step.get("input", {})
+        product_ref = step_input.get("product_ref")
+        product_entity = find_entity(self.id_map, product_ref)
+        if not product_entity:
+            pytest.fail("Product not found.")
 
-                if input_entities:
-                    payload = create_transformation_builder_payload_with_inputs(
-                        input_entities
-                    )
-                    print("payload", json.dumps(payload, indent=2))
-                else:
-                    pytest.fail("input entities not found")
-            else:
-                pytest.fail("input input_refs not found")
+        payload = step_input.get("transformations", {})
+        input_refs = payload.pop("input_refs", [])
+        transformations = payload.pop("transformations", [])
 
-            if product_entity:
-                response = create_transformation_builder(
-                    context, product_entity, payload, access_token, self.request
-                )
-                assert_success_response(response)
-            else:
-                pytest.fail("product not found")
+        input_entities = []
+        for input_ref in input_refs:
+            entity = find_entity(self.id_map, input_ref)
+            if not entity:
+                pytest.fail(f"Input entity not found: {input_ref}")
+
+            identifier = entity["identifier"]
+            input_key = f"input_{identifier.replace('-', '_')}"
+            input_type = "product" if entity["type"] == "product" else "resource"
+
+            input_entities.append(
+                {
+                    "id": input_ref,
+                    "identifier": identifier,
+                    "input_key": input_key,
+                    "input_type": input_type,
+                }
+            )
+
+        transformations_result = []
+        for transform in transformations:
+            result = transform.copy()
+
+            for key in ["input_ref", "other_ref"]:
+                ref = result.pop(key, None)
+                if ref:
+                    matched = next((e for e in input_entities if e["id"] == ref), None)
+                    if matched:
+                        mapped_key = "input" if key == "input_ref" else "other"
+                        result[mapped_key] = matched["input_key"]
+
+            transformations_result.append(result)
+
+        payload["transformations"] = transformations_result
+        payload["inputs"] = [
+            {
+                "input_type": e["input_type"],
+                "identifier": e["input_key"],
+                "preview_limit": 10,
+            }
+            for e in input_entities
+        ]
+
+        print("asdaccc", payload)
+
+        if product_entity:
+            response = create_transformation_builder(
+                context, product_entity, payload, access_token, self.request
+            )
+            assert_success_response(response)
+        else:
+            pytest.fail("product not found")

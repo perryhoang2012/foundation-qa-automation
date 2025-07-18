@@ -2,13 +2,21 @@ from test_data.velora import (
     create_mesh_payload,
     create_system_payload,
     create_source_payload,
-    create_object_payload,
-    create_product_payload,
     create_connection_config_payload,
     create_connection_secret_payload,
-    schema_product_create_payload,
-    create_transformation_builder_payload_with_inputs,
-    configure_object_payload,
+    create_object_daily_reports_payload,
+    create_object_excavation_payload,
+    configure_object_daily_reports_payload,
+    configure_object_excavation_payload,
+    create_product_daily_reports_payload,
+    create_product_excavation_payload,
+    create_product_excavation_progress_payload,
+    schema_product_daily_reports_payload,
+    schema_product_excavation_payload,
+    schema_product_excavation_progress_payload,
+    product_daily_reports_builder_payload,
+    product_excavation_builder_payload,
+    product_excavation_progress_builder_payload,
 )
 
 config = {
@@ -60,7 +68,12 @@ config = {
         {
             "type": "create_object",
             "id": "object-abc",
-            "input": create_object_payload(),
+            "input": create_object_daily_reports_payload(),
+        },
+        {
+            "type": "create_object",
+            "id": "object-def",
+            "input": create_object_excavation_payload(),
         },
         {
             "type": "link_object_to_source",
@@ -70,14 +83,32 @@ config = {
             },
         },
         {
+            "type": "link_object_to_source",
+            "input": {
+                "source_ref": "source-abc",
+                "object_ref": "object-def",
+            },
+        },
+        {
             "type": "configure_object_details",
             "ref": "object-abc",
-            "input": configure_object_payload(),
+            "input": configure_object_daily_reports_payload(),
+        },
+        {
+            "type": "configure_object_details",
+            "ref": "object-def",
+            "input": configure_object_excavation_payload(),
         },
         {
             "type": "get_object_by_id",
             "input": {
                 "object_ref": "object-abc",
+            },
+        },
+        {
+            "type": "get_object_by_id",
+            "input": {
+                "object_ref": "object-def",
             },
         },
         {
@@ -87,10 +118,25 @@ config = {
             "retry_interval": 15,
         },
         {
+            "type": "check_status_compute",
+            "ref": "object-def",
+            "max_retries": 5,
+            "retry_interval": 15,
+        },
+        {
             "type": "create_product",
             "id": "product-abc",
-            "mesh_ref": "mesh-abc",
-            "input": create_product_payload(),
+            "input": create_product_daily_reports_payload(),
+        },
+        {
+            "type": "create_product",
+            "id": "product-def",
+            "input": create_product_excavation_payload(),
+        },
+        {
+            "type": "create_product",
+            "id": "product-gkh",
+            "input": create_product_excavation_progress_payload(),
         },
         {
             "type": "link_product_to_object",
@@ -100,22 +146,78 @@ config = {
             },
         },
         {
+            "type": "link_product_to_object",
+            "input": {
+                "object_ref": "object-def",
+                "product_ref": "product-def",
+            },
+        },
+        {
+            "type": "link_product_to_product",
+            "input": {
+                "product_ref": "product-abc",
+                "product_child_ref": "product-gkh",
+            },
+        },
+        {
+            "type": "link_product_to_product",
+            "input": {
+                "product_ref": "product-def",
+                "product_child_ref": "product-gkh",
+            },
+        },
+        {
             "type": "define_product_schema",
             "ref": "product-abc",
-            "input": schema_product_create_payload(),
+            "input": schema_product_daily_reports_payload(),
+        },
+        {
+            "type": "define_product_schema",
+            "ref": "product-def",
+            "input": schema_product_excavation_payload(),
+        },
+        {
+            "type": "define_product_schema",
+            "ref": "product-gkh",
+            "input": schema_product_excavation_progress_payload(),
         },
         {
             "type": "apply_product_transformation",
             "input": {
                 "product_ref": "product-abc",
-                "input_refs": ["object-abc"],
-                "transformation": create_transformation_builder_payload_with_inputs(),
+                "transformations": product_daily_reports_builder_payload(),
+            },
+        },
+        {
+            "type": "apply_product_transformation",
+            "input": {
+                "product_ref": "product-def",
+                "transformations": product_excavation_builder_payload(),
+            },
+        },
+        {
+            "type": "apply_product_transformation",
+            "input": {
+                "product_ref": "product-gkh",
+                "transformations": product_excavation_progress_builder_payload(),
             },
         },
         {
             "type": "get_product_by_id",
             "input": {
                 "product_ref": "product-abc",
+            },
+        },
+        {
+            "type": "get_product_by_id",
+            "input": {
+                "product_ref": "product-def",
+            },
+        },
+        {
+            "type": "get_product_by_id",
+            "input": {
+                "product_ref": "product-gkh",
             },
         },
         {

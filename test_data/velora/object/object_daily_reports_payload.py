@@ -1,18 +1,16 @@
 import os
 from utils.common import makeid
 
-def create_object_payload(custom_name=None):
+
+def create_object_daily_reports_payload():
     owner_email = os.getenv("OWNER_EMAIL", "")
     owner_name = os.getenv("OWNER_NAME", "")
-    name = f"{custom_name} {makeid(2)}" if custom_name else f"Object {makeid()}"
+    name = f"Daily reports {makeid()}"
     return {
         "entity": {
             "name": name,
             "entity_type": "resource",
-            "description": (
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
-                "sed do eiusmod tempor incididunt aliqua."
-            ),
+            "description": "This data object aggregates all the daily reports submitted by the contractors. Each record is associated with a specific contractor and a report date. The report_id uniquely identifies each report, while the contractor_id (linked to the Contractors table) and report_date provide context for when and by whom the report was generated.",
             "label": "DR",
         },
         "entity_info": {
@@ -22,7 +20,8 @@ def create_object_payload(custom_name=None):
         },
     }
 
-def configure_object_payload():
+
+def configure_object_daily_reports_payload():
     return {
         "configuration": {
             "resource_type": "csv",
