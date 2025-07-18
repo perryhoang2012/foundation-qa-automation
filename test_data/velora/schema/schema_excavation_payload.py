@@ -1,0 +1,68 @@
+def schema_product_excavation_payload():
+    return {
+        "details": {
+            "product_type": "stored",
+            "fields": [
+                {
+                    "name": "excavation_id",
+                    "description": None,
+                    "primary": True,
+                    "optional": False,
+                    "data_type": {"meta": {}, "column_type": "INTEGER"},
+                    "classification": "internal",
+                    "sensitivity": None,
+                    "tags": [],
+                },
+                {
+                    "name": "report_id",
+                    "description": None,
+                    "primary": False,
+                    "optional": False,
+                    "data_type": {"meta": {}, "column_type": "INTEGER"},
+                    "classification": "internal",
+                    "sensitivity": None,
+                    "tags": [],
+                },
+                {
+                    "name": "planned_quantity",
+                    "description": None,
+                    "primary": False,
+                    "optional": False,
+                    "data_type": {"meta": {}, "column_type": "DOUBLE"},
+                    "classification": "internal",
+                    "sensitivity": None,
+                    "tags": [],
+                },
+                {
+                    "name": "daily_quantity",
+                    "description": None,
+                    "primary": False,
+                    "optional": False,
+                    "data_type": {"meta": {}, "column_type": "DOUBLE"},
+                    "classification": "internal",
+                    "sensitivity": None,
+                    "tags": [],
+                },
+                {
+                    "name": "cumulative_quantity",
+                    "description": None,
+                    "primary": False,
+                    "optional": False,
+                    "data_type": {"meta": {}, "column_type": "DOUBLE"},
+                    "classification": "internal",
+                    "sensitivity": None,
+                    "tags": [],
+                },
+                {
+                    "name": "adjustments_delta",
+                    "description": None,
+                    "primary": False,
+                    "optional": False,
+                    "data_type": {"meta": {}, "column_type": "DOUBLE"},
+                    "classification": "internal",
+                    "sensitivity": None,
+                    "tags": [],
+                },
+            ],
+        }
+    }

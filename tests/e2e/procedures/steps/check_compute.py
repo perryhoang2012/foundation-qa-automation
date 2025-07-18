@@ -14,8 +14,6 @@ from utils.common import assert_success_response, find_entity, skip_if_no_token
 class CheckStatusComputeStep(ProcedureStep):
     """Step to check the status of a compute."""
 
-    
-
     def execute(self) -> None:
         DEFAULT_NUM_RETRIES = 5
         DEFAULT_DELAY_SECONDS = 60
@@ -52,10 +50,9 @@ class CheckStatusComputeStep(ProcedureStep):
             assert_success_response(response)
 
             data = response.json()
-            print('datayo', data)
             status = data.get("status")
 
-            if status.get('status') == StatusCheckCompute.COMPLETED.value:
+            if status.get("status") == StatusCheckCompute.COMPLETED.value:
                 print("[CheckStatusComputeStep] Compute completed successfully.")
                 return
 
@@ -66,5 +63,3 @@ class CheckStatusComputeStep(ProcedureStep):
                 time.sleep(DELAY_SECONDS)
             else:
                 pytest.fail("Compute failed after retries")
-              
-        

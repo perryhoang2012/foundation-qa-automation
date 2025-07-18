@@ -1,4 +1,4 @@
-def schema_product_create_payload():
+def schema_product_daily_reports_payload():
     return {
         "details": {
             "product_type": "stored",
@@ -8,10 +8,7 @@ def schema_product_create_payload():
                     "description": None,
                     "primary": True,
                     "optional": False,
-                    "data_type": {
-                        "meta": {},
-                        "column_type": "INTEGER",
-                    },
+                    "data_type": {"meta": {}, "column_type": "INTEGER"},
                     "classification": "internal",
                     "sensitivity": None,
                     "tags": [],
@@ -21,10 +18,7 @@ def schema_product_create_payload():
                     "description": None,
                     "primary": False,
                     "optional": False,
-                    "data_type": {
-                        "meta": {},
-                        "column_type": "VARCHAR",
-                    },
+                    "data_type": {"meta": {}, "column_type": "VARCHAR"},
                     "classification": "internal",
                     "sensitivity": None,
                     "tags": [],
@@ -34,10 +28,7 @@ def schema_product_create_payload():
                     "description": None,
                     "primary": False,
                     "optional": False,
-                    "data_type": {
-                        "meta": {},
-                        "column_type": "VARCHAR",
-                    },
+                    "data_type": {"meta": {}, "column_type": "VARCHAR"},
                     "classification": "internal",
                     "sensitivity": None,
                     "tags": [],
@@ -47,10 +38,7 @@ def schema_product_create_payload():
                     "description": None,
                     "primary": False,
                     "optional": False,
-                    "data_type": {
-                        "meta": {},
-                        "column_type": "VARCHAR",
-                    },
+                    "data_type": {"meta": {}, "column_type": "VARCHAR"},
                     "classification": "internal",
                     "sensitivity": None,
                     "tags": [],
@@ -60,14 +48,11 @@ def schema_product_create_payload():
                     "description": None,
                     "primary": False,
                     "optional": False,
-                    "data_type": {
-                        "meta": {},
-                        "column_type": "VARCHAR",
-                    },
+                    "data_type": {"meta": {}, "column_type": "VARCHAR"},
                     "classification": "internal",
                     "sensitivity": None,
                     "tags": [],
                 },
             ],
-        },
+        }
     }

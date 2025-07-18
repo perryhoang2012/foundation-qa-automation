@@ -1,6 +1,7 @@
 import os
 from utils.common import makeid
 
+
 def create_mesh_payload(custom_name=None):
     owner_email = os.getenv("OWNER_EMAIL", "")
     owner_name = os.getenv("OWNER_NAME", "")
@@ -10,11 +11,8 @@ def create_mesh_payload(custom_name=None):
             "name": name,
             "entity_type": "mesh",
             "label": "MSH",
-            "description": (
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
-                "sed do eiusmod tempor incididunt aliqua."
-            ),
-            "purpose": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+            "description": "Construction project data mesh with synthetic demo data for testing and demonstration",
+            "purpose": "Demo and testing of construction data workflows and analytics",
             "assignees": [
                 {
                     "email": owner_email,

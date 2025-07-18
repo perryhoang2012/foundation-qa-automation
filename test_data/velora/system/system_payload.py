@@ -1,6 +1,7 @@
 import os
 from utils.common import makeid
 
+
 def create_system_payload(custom_name=None):
     owner_email = os.getenv("OWNER_EMAIL", "")
     owner_name = os.getenv("OWNER_NAME", "")
@@ -10,10 +11,7 @@ def create_system_payload(custom_name=None):
             "name": name,
             "entity_type": "data_system",
             "label": "DSS",
-            "description": (
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
-                "sed do eiusmod tempor incididunt aliqua."
-            ),
+            "description": "Procore is a comprehensive construction management platform that captures detailed daily field activities, including work progress, crew attendance, and material usage. It provides real-time insights into on-site operations and supports accurate daily reporting.",
             "owner_person": {
                 "email": owner_email,
                 "full_name": owner_name,

@@ -1,5 +1,6 @@
 import random
 import string
+import json
 import os
 import pytest
 
@@ -34,12 +35,16 @@ def find_entity(id_map, entity_id):
 
 
 def record_api_info(request, method, url, payload, response):
+    response_result = response if isinstance(response, str) else response.json() if response else None
     request.node._api_info = {
         "method": method,
         "url": url,
         "payload": payload,
-        "response": response,
+        "response": response_result,
     }
+    print(method, url)
+    print('Payload:', json.dumps(payload, indent = 2))
+    print('Response:', json.dumps(response_result, indent = 2))
 
 
 def skip_if_no_token(access_token: str) -> None:
